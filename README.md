@@ -12,7 +12,7 @@
 
   <p align="center">
 A package to suggest related clinical ontologies    <br />
-    (LOINC, SNOMED-CT)
+    (LOINC, SNOMED-CT, etc.)
   </p>
 </div>
 
