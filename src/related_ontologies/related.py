@@ -10,6 +10,14 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 
+class ScorerNotAvailable(Exception):
+    pass
+
+
+class VectorizerNotDefined(Exception):
+    pass
+
+
 def ngrams(string: str, n=10) -> list:
     """
     Takes an input string, cleans it and converts to ngrams.
@@ -32,7 +40,7 @@ def ngrams(string: str, n=10) -> list:
     return [''.join(ngram) for ngram in ngrams]
 
 
-def generateRelatedOntologies(query: str, choices: list, method: str) -> list:
+def generateRelatedOntologies(query: str, choices: list, method: str, **kwargs) -> list or pd.DataFrame:
     """
     Generates ontologies in choices that are related to the query based on the method selected.
     :param query: str
@@ -41,15 +49,59 @@ def generateRelatedOntologies(query: str, choices: list, method: str) -> list:
     :return: list
     """
     if method == 'partial_ratio':
-        query = list(query)
-        related = process.extractBests(query, choices, scorer=fuzz.partial_ratio, limit=100)
+        try:
+            kwargs['df_loinc']
+        except KeyError:
+            related = process.extractBests(query, choices, scorer=fuzz.partial_ratio, limit=100)
+            return related[1:]
+        else:
+            df_loinc = kwargs['df_loinc']
+            related = process.extractBests(query, choices, scorer=fuzz.partial_ratio, limit=100)
+            df_related_score = pd.DataFrame(related[1:], columns=['LONG_COMMON_NAME', 'partial_ratio'])
+            df_related = df_loinc[df_loinc['LONG_COMMON_NAME'].isin([i[0] for i in related[1:]])]
+            df_data = df_related.merge(df_related_score, on='LONG_COMMON_NAME')
+            df_data = df_data.sort_values(by=['partial_ratio'], ascending=False)
+            return df_data
     elif method == 'jaro_winkler':
-        related = 1.0
+        try:
+            kwargs['df_loinc']
+        except KeyError:
+            related = process.extractBests(query, choices, scorer=jaro.jaro_winkler_metric, limit=100)
+            return related[1:]
+        else:
+            df_loinc = kwargs['df_loinc']
+            related = process.extractBests(query, choices, scorer=jaro.jaro_winkler_metric, limit=100)
+            df_related_score = pd.DataFrame(related[1:], columns=['LONG_COMMON_NAME', 'partial_ratio'])
+            df_related = df_loinc[df_loinc['LONG_COMMON_NAME'].isin([i[0] for i in related[1:]])]
+            df_data = df_related.merge(df_related_score, on='LONG_COMMON_NAME')
+            df_data = df_data.sort_values(by=['partial_ratio'], ascending=False)
+            return df_data
+
     elif method == 'tf_idf':
-        related = 2.0
+        try:
+            kwargs['vectorizer'], kwargs['tf_idf_matrix']
+        except KeyError:
+            raise VectorizerNotDefined("Please define a vectorizer in the fucntion call.")
+        else:
+            vectorizer = kwargs['vectorizer']
+            tf_idf_matrix = kwargs['tf_idf_matrix']
+            try:
+                kwargs['df_loinc']
+            except KeyError:
+                fitted_query = vectorizer.transform([query])
+                scores = cosine_similarity(tf_idf_matrix, fitted_query)
+                return scores
+            else:
+                df_loinc = kwargs['df_loinc']
+                fitted_query = vectorizer.transform([query])
+                scores = cosine_similarity(tf_idf_matrix, fitted_query)
+                df_loinc_temp = df_loinc
+                df_loinc_temp['cosine_score'] = scores
+                df_loinc_temp = df_loinc_temp.sort_values(by=['cosine_score'], ascending=False)
+                df_data = df_loinc_temp[1:101]
+                return df_data
     else:
-        related = 0.0
-    return related
+        raise ScorerNotAvailable("Please define scorer from available options in the configuration file.")
 
 
 def partial_ratio(string_1: str, string_2: str) -> float:
