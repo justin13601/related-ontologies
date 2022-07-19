@@ -1,3 +1,6 @@
+import re
+from ftfy import fix_text
+
 def ngrams(string, n=10):
     """
     Takes an input string, cleans it and converts to ngrams.
