@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "related-ontologies"
-version = "0.0.2"
+version = "0.0.3"
 authors = [
   { name="Justin Xu", email="justin13601@hotmail.com" },
 ]
@@ -16,6 +16,10 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
+]
+dependencies = [
+  'PyYAML ~= 5.0',
+  'ftfy == 6.1.1',
 ]
 
 [project.urls]
