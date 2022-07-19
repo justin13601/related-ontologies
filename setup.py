@@ -4,7 +4,7 @@ setuptools.setup(
     name='related-ontologies',
     version='0.0.1',
     description='A package to generate related clinical ontologies (LOINC, SNOMED-CT)',
-    url='https://github.com/alistairewj/bert-deid',
+    url='https://github.com/justin13601/related-ontologies',
     author='Justin Xu',
     author_email='justin13601@hotmail.com',
     license='MIT',
