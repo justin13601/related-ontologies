@@ -2,8 +2,9 @@ import os
 import yaml
 import time
 import errno
+import pickle
 import pandas as pd
-from related_ontologies.related import generateRelatedOntologies
+from related_ontologies.related import ngrams, generateRelatedOntologies, TfidfVectorizer
 
 
 def load_config(file):
@@ -42,11 +43,22 @@ if __name__ == "__main__":
     ###############
     query = list(loinc_dict.values())[0]
     choices = list(loinc_dict.values())
-    method = 'partial_ratio'
+    method = 'tf_idf'
 
-    related = generateRelatedOntologies(query, choices, method)
+    if method == 'tf_idf':
+        vectorizer = TfidfVectorizer(min_df=1, analyzer=ngrams, lowercase=False, vocabulary=pickle.load(
+            open(r'C:\Users\Justin\PycharmProjects\mimic-iv-dash\demo-data\LOINC_vectorizer_vocabulary_n=10.pkl',
+                 "rb")))
+        vectorizer.fit_transform(list(df_loinc_new['LONG_COMMON_NAME'].unique()))
+        tf_idf_matrix = pickle.load(
+            open(r'C:\Users\Justin\PycharmProjects\mimic-iv-dash\demo-data\LOINC_tf_idf_matrix_n=10.pkl', "rb"))
 
-    df_related_score = pd.DataFrame(related[1:], columns=['LONG_COMMON_NAME', 'partial_ratio'])
-    df_related = df_loinc_new[df_loinc_new['LONG_COMMON_NAME'].isin([i[0] for i in related[1:]])]
-    df_data = df_related.merge(df_related_score, on='LONG_COMMON_NAME')
-    df_data = df_data.sort_values(by=['partial_ratio'], ascending=False)
+    if method == 'partial_ratio':
+        result = generateRelatedOntologies(query, choices, method, df_loinc=df_loinc_new)
+    elif method == 'jaro_winkler':
+        result = generateRelatedOntologies(query, choices, method, df_loinc=df_loinc_new)
+    elif method == 'tf_idf':
+        result = generateRelatedOntologies(query, choices, method, df_loinc=df_loinc_new, vectorizer=vectorizer,
+                                           tf_idf_matrix=tf_idf_matrix)
+
+    print('End testing.')
