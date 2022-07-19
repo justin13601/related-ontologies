@@ -10,7 +10,8 @@ setuptools.setup(
     license='MIT',
     packages=setuptools.find_packages(),
     install_requires=[
-
+        'numpy>=1.19.2', 'pandas>=1.1.3',
+        'pytest>=4.2.0', 'scikit-learn>=0.23.2'
     ],
     python_requires='>=3.6',
     entry_points={
