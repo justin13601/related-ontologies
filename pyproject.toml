@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "related_ontologies"
-version = "0.1.2"
+version = "0.1.5"
 authors = [
     { name = "Justin Xu", email = "justin13601@hotmail.com" },
 ]
@@ -18,12 +18,12 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    'PyYAML == 6.0',
-    'ftfy == 6.1.1',
-    'pandas == 1.4.3',
-    'scikit-learn == 1.0.2',
-    'fuzzywuzzy == 0.18.0',
-    'jaro-winkler == 2.0.0'
+    'PyYAML >= 6.0',
+    'ftfy >= 6.1.1',
+    'pandas >= 1.4.3',
+    'scikit-learn >= 1.1.1',
+    'fuzzywuzzy >= 0.18.0',
+    'jaro-winkler >= 2.0.0'
 ]
 
 [project.urls]
