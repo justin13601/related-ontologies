@@ -66,7 +66,11 @@ The package requires the following to run:
 * [Pandas][pandas]~=1.4.2
 * [NumPy][numpy]~=1.22.3
 * [SciPy][scipy]~=1.7.3
-* [Scikit-learn][sklearn]>=1.0.2
+* [Scikit-learn][sklearn]~=1.1.1
+* [PyYAML][pyyaml] >= 6.0
+* [Ftfy][ftfy] >= 6.1.1
+* [Fuzzywuzzy][fuzzywuzzy] >= 0.18.0
+* [Jaro-Winkler][jaro] >= 2.0.0
 
 All packages are listed in ```requirements.txt```.
 
@@ -115,5 +119,13 @@ Distributed under the [MIT][mit] License.
 [numpy]: https://numpy.org/install/
 
 [scipy]: https://scipy.org/install/
+
+[ftfy]: https://pypi.org/project/ftfy/
+
+[pyyaml]: https://pypi.org/project/PyYAML/
+
+[fuzzywuzzy]: https://pypi.org/project/fuzzywuzzy/
+
+[jaro]: https://pypi.org/project/jaro-winkler/
 
 [mit]: https://opensource.org/licenses/MIT
