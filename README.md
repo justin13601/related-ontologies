@@ -74,7 +74,7 @@ All packages are listed in ```requirements.txt```.
 
 ### Installation
    ```sh
-   pip install related-ontologies
+   pip install related_ontologies
    ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
@@ -85,7 +85,7 @@ All packages are listed in ```requirements.txt```.
 ## Usage
 
 ```
-import related-ontologies
+import related_ontologies
 ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
