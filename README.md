@@ -1,6 +1,7 @@
 <div id="top"></div>
 
 [![Python](https://ForTheBadge.com/images/badges/made-with-python.svg)](https://colab.research.google.com/)
+[![DOI](https://zenodo.org/badge/515409655.svg)](https://zenodo.org/badge/latestdoi/515409655)
 
 
 
