@@ -50,30 +50,30 @@ def generateRelatedOntologies(query: str, choices: list, method: str, **kwargs) 
     """
     if method == 'partial_ratio':
         try:
-            kwargs['df_loinc']
+            kwargs['df_ontology']
         except KeyError:
             related = process.extractBests(query, choices, scorer=fuzz.partial_ratio, limit=100)
             return related[1:]
         else:
-            df_loinc = kwargs['df_loinc']
+            df_ontology = kwargs['df_ontology']
             related = process.extractBests(query, choices, scorer=fuzz.partial_ratio, limit=100)
-            df_related_score = pd.DataFrame(related[1:], columns=['LONG_COMMON_NAME', 'partial_ratio'])
-            df_related = df_loinc[df_loinc['LONG_COMMON_NAME'].isin([i[0] for i in related[1:]])]
-            df_data = df_related.merge(df_related_score, on='LONG_COMMON_NAME')
+            df_related_score = pd.DataFrame(related[1:], columns=['LABEL', 'partial_ratio'])
+            df_related = df_ontology[df_ontology['LABEL'].isin([i[0] for i in related[1:]])]
+            df_data = df_related.merge(df_related_score, on='LABEL')
             df_data = df_data.sort_values(by=['partial_ratio'], ascending=False)
             return df_data
     elif method == 'jaro_winkler':
         try:
-            kwargs['df_loinc']
+            kwargs['df_ontology']
         except KeyError:
             related = process.extractBests(query, choices, scorer=jaro.jaro_winkler_metric, limit=100)
             return related[1:]
         else:
-            df_loinc = kwargs['df_loinc']
+            df_ontology = kwargs['df_ontology']
             related = process.extractBests(query, choices, scorer=jaro.jaro_winkler_metric, limit=100)
-            df_related_score = pd.DataFrame(related[1:], columns=['LONG_COMMON_NAME', 'partial_ratio'])
-            df_related = df_loinc[df_loinc['LONG_COMMON_NAME'].isin([i[0] for i in related[1:]])]
-            df_data = df_related.merge(df_related_score, on='LONG_COMMON_NAME')
+            df_related_score = pd.DataFrame(related[1:], columns=['LABEL', 'partial_ratio'])
+            df_related = df_ontology[df_ontology['LABEL'].isin([i[0] for i in related[1:]])]
+            df_data = df_related.merge(df_related_score, on='LABEL')
             df_data = df_data.sort_values(by=['partial_ratio'], ascending=False)
             return df_data
 
@@ -86,19 +86,19 @@ def generateRelatedOntologies(query: str, choices: list, method: str, **kwargs) 
             vectorizer = kwargs['vectorizer']
             tf_idf_matrix = kwargs['tf_idf_matrix']
             try:
-                kwargs['df_loinc']
+                kwargs['df_ontology']
             except KeyError:
                 fitted_query = vectorizer.transform([query])
                 scores = cosine_similarity(tf_idf_matrix, fitted_query)
                 return scores
             else:
-                df_loinc = kwargs['df_loinc']
+                df_ontology = kwargs['df_ontology']
                 fitted_query = vectorizer.transform([query])
                 scores = cosine_similarity(tf_idf_matrix, fitted_query)
-                df_loinc_temp = df_loinc
-                df_loinc_temp['cosine_score'] = scores
-                df_loinc_temp = df_loinc_temp.sort_values(by=['cosine_score'], ascending=False)
-                df_data = df_loinc_temp[1:101]
+                df_ontology_temp = df_ontology
+                df_ontology_temp['cosine_score'] = scores
+                df_ontology_temp = df_ontology_temp.sort_values(by=['cosine_score'], ascending=False)
+                df_data = df_ontology_temp[1:101]
                 return df_data
     else:
         raise ScorerNotAvailable("Please define scorer from available options in the configuration file.")
