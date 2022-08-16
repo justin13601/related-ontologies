@@ -1,5 +1,6 @@
 import re
 import time
+import requests
 import pandas as pd
 import jaro
 from fuzzywuzzy import fuzz
@@ -15,6 +16,10 @@ class ScorerNotAvailable(Exception):
 
 
 class VectorizerNotDefined(Exception):
+    pass
+
+
+class APIKeyNotDefined(Exception):
     pass
 
 
@@ -62,6 +67,7 @@ def generateRelatedOntologies(query: str, choices: list, method: str, **kwargs) 
             df_data = df_related.merge(df_related_score, on='LABEL')
             df_data = df_data.sort_values(by=['partial_ratio'], ascending=False)
             return df_data
+
     elif method == 'jaro_winkler':
         try:
             kwargs['df_ontology']
@@ -100,6 +106,21 @@ def generateRelatedOntologies(query: str, choices: list, method: str, **kwargs) 
                 df_ontology_temp = df_ontology_temp.sort_values(by=['cosine_score'], ascending=False)
                 df_data = df_ontology_temp[1:101]
                 return df_data
+
+    elif method == 'UMLS':
+        try:
+            kwargs['apikey']
+        except KeyError:
+            raise APIKeyNotDefined('Please provide your NLM UMLS API key.')
+        else:
+            base_uri = 'https://uts-ws.nlm.nih.gov'
+            path = '/search/current/'
+            query = {'apiKey': kwargs['apikey'], 'string': query, 'sabs': 'SNOMEDCT_US', 'returnIdType': 'code'}
+            output = requests.get(base_uri + path, params=query)
+            outputJson = output.json()
+            results = (([outputJson['result']])[0])['results']
+            related = [(item['name'], item['ui']) for item in results]
+            return related
     else:
         raise ScorerNotAvailable("Please define scorer from available options in the configuration file.")
 
