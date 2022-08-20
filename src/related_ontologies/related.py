@@ -77,17 +77,17 @@ def generateRelatedOntologies(query: str, choices: list, method: str, **kwargs) 
         else:
             df_ontology = kwargs['df_ontology']
             related = process.extractBests(query, choices, scorer=jaro.jaro_winkler_metric, limit=100)
-            df_related_score = pd.DataFrame(related[1:], columns=['LABEL', 'partial_ratio'])
+            df_related_score = pd.DataFrame(related[1:], columns=['LABEL', 'jaro_winkler'])
             df_related = df_ontology[df_ontology['LABEL'].isin([i[0] for i in related[1:]])]
             df_data = df_related.merge(df_related_score, on='LABEL')
-            df_data = df_data.sort_values(by=['partial_ratio'], ascending=False)
+            df_data = df_data.sort_values(by=['jaro_winkler'], ascending=False)
             return df_data
 
     elif method == 'tf_idf':
         try:
             kwargs['vectorizer'], kwargs['tf_idf_matrix']
         except KeyError:
-            raise VectorizerNotDefined("Please define a vectorizer in the fucntion call.")
+            raise VectorizerNotDefined("Please define a vectorizer in the function call.")
         else:
             vectorizer = kwargs['vectorizer']
             tf_idf_matrix = kwargs['tf_idf_matrix']
