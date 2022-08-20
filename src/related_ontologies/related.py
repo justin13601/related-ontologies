@@ -102,8 +102,8 @@ def generateRelatedOntologies(query: str, choices: list, method: str, **kwargs) 
                 fitted_query = vectorizer.transform([query])
                 scores = cosine_similarity(tf_idf_matrix, fitted_query)
                 df_ontology_temp = df_ontology
-                df_ontology_temp['cosine_score'] = scores
-                df_ontology_temp = df_ontology_temp.sort_values(by=['cosine_score'], ascending=False)
+                df_ontology_temp['tf_idf'] = scores
+                df_ontology_temp = df_ontology_temp.sort_values(by=['tf_idf'], ascending=False)
                 df_data = df_ontology_temp[1:101]
                 return df_data
 
